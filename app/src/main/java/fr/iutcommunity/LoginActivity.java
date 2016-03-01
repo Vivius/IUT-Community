@@ -32,10 +32,8 @@ public class LoginActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        //HttpRequest http = new HttpRequest("http://iut-community.vpeillex.fr",HttpRequest.POST);
-        //JSONObject data =  http.connection();
+        // Utilisation d'un service web en asynchrone.
         new HttpRequestManager().execute();
-
     }
 
     @Override
@@ -63,12 +61,14 @@ public class LoginActivity extends ActionBarActivity {
     // Exemple d'appel à un web service avec la classe HttpRequest.
     private class HttpRequestManager extends AsyncTask<HashMap<?,?>, String, JSONObject>{
 
+        // On peut passer une HashMap avec Clé/Valeurs pour envoyer en POST ou en GET.
         @Override
         protected JSONObject doInBackground(HashMap... params) {
             HttpRequest http = new HttpRequest("http://iut-community.vpeillex.fr",HttpRequest.POST);
             return http.connection();
         }
 
+        // Une fois le résultat obtenu, on en fait ce que l'on veut. Il s'agit ici d'un objet JSON.
         @Override
         protected void onPostExecute(JSONObject data) {
             EditText txtLogin = (EditText)findViewById(R.id.txtLogin);
