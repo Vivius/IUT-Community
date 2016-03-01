@@ -62,6 +62,7 @@ public class HttpRequestTaskManager extends AsyncTask<HashMap, String, JSONObjec
     }
 
     @TargetApi(Build.VERSION_CODES.KITKAT)
+    @Override
     protected JSONObject doInBackground(HashMap[] params) {
         JSONObject jsonResponse = new JSONObject();
         try {
@@ -75,8 +76,8 @@ public class HttpRequestTaskManager extends AsyncTask<HashMap, String, JSONObjec
                 String urlParameters = "";
                 Boolean firstParameter;
                 for(HashMap h : params){
-                    firstParameter = true;
                     Iterator iterator = h.entrySet().iterator();
+                    firstParameter = true;
                     while (iterator.hasNext()){
                         Map.Entry m = (Map.Entry) iterator.next();
                         if(firstParameter){
@@ -120,7 +121,6 @@ public class HttpRequestTaskManager extends AsyncTask<HashMap, String, JSONObjec
 
     protected void onPostExecute(JSONObject data){
         setData(data);
-        Log.e("Data",data.toString());
     }
 
     //Méthode permmettant de convertir un InputStream en String.

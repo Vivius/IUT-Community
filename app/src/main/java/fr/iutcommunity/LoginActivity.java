@@ -1,9 +1,26 @@
 package fr.iutcommunity;
 
+import android.annotation.TargetApi;
+import android.os.AsyncTask;
+import android.os.Build;
+import android.os.NetworkOnMainThreadException;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 
 public class LoginActivity extends ActionBarActivity {
@@ -34,5 +51,11 @@ public class LoginActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    protected void onResume(){
+        super.onResume();
+        HttpRequestTaskManager http = new HttpRequestTaskManager("http://iut-community.vpeillex.fr", "POST");
+        http.execute();
     }
 }
