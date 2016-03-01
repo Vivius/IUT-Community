@@ -1,7 +1,6 @@
 package fr.iutcommunity;
 
 import android.annotation.TargetApi;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.NetworkOnMainThreadException;
 import android.util.Log;
@@ -15,16 +14,21 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 /**
- * Created by peillexv on 01/03/2016.
+ * Created by Vincent on 01/03/2016.
  */
-public class HttpRequestTaskManager extends AsyncTask<HashMap, String, JSONObject>{
+public class HttpRequest {
+
+    // PropriÃ©tÃ©s
     private String url;
     private String method;
     private JSONObject data;
+    private HashMap<?,?> parameters;
+
+    public static String POST = "POST";
+    public static String GET = "GET";
 
     // Getters & Setters
     public String getUrl() {
@@ -45,68 +49,81 @@ public class HttpRequestTaskManager extends AsyncTask<HashMap, String, JSONObjec
     public void setData(JSONObject data) {
         this.data = data;
     }
+    public HashMap<?, ?> getParameters() {
+        return parameters;
+    }
+    public void setParameters(HashMap<?, ?> parameters) {
+        this.parameters = parameters;
+    }
 
-    // Constructeur
-    public HttpRequestTaskManager(String url, String method){
-        if(!url.isEmpty()){
-            setUrl(url);
-        }else{
-            setUrl("http://iut-community.vpeillex.fr");
-        }
+    //Constructeurs
+    public HttpRequest(String url){
         setUrl(url);
-        if(method.equals("POST") || method.equals("GET")){
+        setMethod(HttpRequest.POST);
+        setParameters(new HashMap<String, String>());
+    }
+    public HttpRequest(String url, String method){
+        this(url);
+        if(method.equals(POST) || method.equals(GET)){
             setMethod(method);
         }else{
-            setMethod("POST");
+            setMethod(POST);
+        }
+    }
+    public HttpRequest(String url, String method, HashMap<?,?> parameters){
+        this(url, method);
+        if(!parameters.isEmpty()){
+            setParameters(parameters);
         }
     }
 
+    //MÃ©thode permmettant de convertir un InputStream en String.
+    private String convertStreamToString(java.io.InputStream is) {
+        java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
+        return s.hasNext() ? s.next() : "";
+    }
+
     @TargetApi(Build.VERSION_CODES.KITKAT)
-    @Override
-    protected JSONObject doInBackground(HashMap[] params) {
+    public JSONObject connection(){
         JSONObject jsonResponse = new JSONObject();
         try {
-            // Connexion
+            // CrÃ©ation de la connexion.
             URL url = new URL(getUrl());
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod(getMethod());
 
-            if(params.length > 0){
-                // Construction de la requête POST.
+            // On vÃ©rifie qu'il y ait des paramÃ¨tres Ã  envoyer.
+            if(!getParameters().isEmpty()){
+                // Construction de la requÃªte POST ou GET.
                 String urlParameters = "";
-                Boolean firstParameter;
-                for(HashMap h : params){
-                    Iterator iterator = h.entrySet().iterator();
-                    firstParameter = true;
-                    while (iterator.hasNext()){
-                        Map.Entry m = (Map.Entry) iterator.next();
-                        if(firstParameter){
-                            urlParameters += m.getKey() + "=" + m.getValue();
-                            firstParameter = false;
-                        }else{
-                            urlParameters += "&" + m.getKey() + "=" + m.getValue();
-                        }
+                Boolean firstParameter = true;
+                for (Map.Entry m : getParameters().entrySet()){
+                    if(firstParameter){
+                        urlParameters += m.getKey() + "=" + m.getValue();
+                        firstParameter = false;
+                    }else{
+                        urlParameters += "&" + m.getKey() + "=" + m.getValue();
                     }
                 }
-                // Encodage en UTF-8 de la requête POST.
+
+                // Encodage en UTF-8 de la requÃªte.
                 byte[] postData = urlParameters.getBytes(StandardCharsets.UTF_8);
-                //On modifie l'entête de la requette HTTP en indiquant la taille des données avec Content-Lengh qui correspond à postData.length (la taille du message).
+                // DÃ©finition de la taille du message.
                 connection.setRequestProperty("Content-Length", "" + postData.length);
-                // On crée et envoi le DataOutputStream.
+                // On crÃ©e et envoi le DataOutputStream.
                 DataOutputStream out = new DataOutputStream(connection.getOutputStream());
                 out.write(postData);
                 out.close();
             }
 
-            // Connexion...
+            // Connexion pour la rÃ©ception des donnÃ©es.
             connection.connect();
-
-            // Réception des données.
+            // RÃ©ception des donnÃ©es en InputStream.
             InputStream input = new BufferedInputStream(connection.getInputStream());
-            // Conversion des données en Json.
+            // Conversion des donnÃ©es en Json.
             jsonResponse = new JSONObject(convertStreamToString(input));
 
-            //Gestion des diverses exceptions...
+        //Gestion des diverses exceptions...
         } catch (IOException e) {
             Log.e("IO", e.getMessage());
         } catch (JSONException e) {
@@ -115,17 +132,7 @@ public class HttpRequestTaskManager extends AsyncTask<HashMap, String, JSONObjec
             Log.e("NetworkOnMainThread", e.getMessage());
         }
         // Retour de l'objet Json.
+        setData(jsonResponse);
         return jsonResponse;
-        //A la fin de l'exécution de cette méthode doInBackground, la méthode onPostExecute va être appelée si elle est déclarée.
-    }
-
-    protected void onPostExecute(JSONObject data){
-        setData(data);
-    }
-
-    //Méthode permmettant de convertir un InputStream en String.
-    protected String convertStreamToString(java.io.InputStream is) {
-        java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
-        return s.hasNext() ? s.next() : "";
     }
 }
