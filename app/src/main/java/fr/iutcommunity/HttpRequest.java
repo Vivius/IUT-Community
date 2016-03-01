@@ -18,6 +18,8 @@ import java.util.Map;
 
 /**
  * Created by Vincent on 01/03/2016.
+ * Attention cette classe ne peut être utiliée qu'en ASYNCHRONE.
+ * Il faut donc l'utiliser avec AsyncTask.
  */
 public class HttpRequest {
 
