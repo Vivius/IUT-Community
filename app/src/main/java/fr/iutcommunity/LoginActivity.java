@@ -10,6 +10,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -21,6 +23,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 
 
 public class LoginActivity extends ActionBarActivity {
@@ -29,6 +32,10 @@ public class LoginActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        //HttpRequest http = new HttpRequest("http://iut-community.vpeillex.fr",HttpRequest.POST);
+        //JSONObject data =  http.connection();
+        new HttpRequestManager().execute();
+
     }
 
     @Override
@@ -53,9 +60,23 @@ public class LoginActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    protected void onResume(){
-        super.onResume();
-        HttpRequestTaskManager http = new HttpRequestTaskManager("http://iut-community.vpeillex.fr", "POST");
-        http.execute();
+    // Exemple d'appel à un web service avec la classe HttpRequest.
+    private class HttpRequestManager extends AsyncTask<HashMap<?,?>, String, JSONObject>{
+
+        @Override
+        protected JSONObject doInBackground(HashMap... params) {
+            HttpRequest http = new HttpRequest("http://iut-community.vpeillex.fr",HttpRequest.POST);
+            return http.connection();
+        }
+
+        @Override
+        protected void onPostExecute(JSONObject data) {
+            EditText txtLogin = (EditText)findViewById(R.id.txtLogin);
+            try {
+                txtLogin.setText(data.getString("message"));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
