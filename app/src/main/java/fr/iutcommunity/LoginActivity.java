@@ -22,7 +22,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private Button btnConnexion;
     private EditText txtLogin;
     private EditText txtPassword;
-    private TextView lblMessage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
