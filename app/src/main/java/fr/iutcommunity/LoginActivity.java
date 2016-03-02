@@ -34,7 +34,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         txtLogin = (EditText)findViewById(R.id.txtLogin);
         txtPassword = (EditText)findViewById(R.id.txtPassword);
-        lblMessage = (TextView)findViewById(R.id.lblMessage);
     }
 
     @Override
