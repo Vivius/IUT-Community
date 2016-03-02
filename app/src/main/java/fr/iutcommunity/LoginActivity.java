@@ -1,11 +1,10 @@
 package fr.iutcommunity;
 
-import android.annotation.TargetApi;
+import android.content.Intent;
 import android.os.AsyncTask;
-import android.os.Build;
-import android.os.NetworkOnMainThreadException;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -13,21 +12,13 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.BufferedInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 
-
-public class LoginActivity extends ActionBarActivity implements View.OnClickListener{
+public class LoginActivity extends AppCompatActivity implements View.OnClickListener{
     private Button btnConnexion;
     private EditText txtLogin;
     private EditText txtPassword;
@@ -94,9 +85,10 @@ public class LoginActivity extends ActionBarActivity implements View.OnClickList
         protected void onPostExecute(JSONObject data) {
             try {
                 if(data.getBoolean("message")){
-                    lblMessage.setText("Connexion réussie !");
+                    Intent mainAct = new Intent(LoginActivity.this, MainActivity.class);
+                    LoginActivity.this.startActivity(mainAct);
                 }else{
-                    lblMessage.setText("Echec de la connexion.");
+                    Toast.makeText(getApplicationContext(),"Echec de connexion. Veuillez vérifier vos identifiants", Toast.LENGTH_LONG).show();
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
