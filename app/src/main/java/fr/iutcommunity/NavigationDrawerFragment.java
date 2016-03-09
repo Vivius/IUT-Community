@@ -29,8 +29,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Fragment used for managing interactions for and presentation of a navigation drawer.
@@ -39,7 +42,7 @@ import java.util.List;
  */
 public class NavigationDrawerFragment extends Fragment {
 
-    // VARAIBLES PERSOS
+    // VARIABLES PERSO
     public List<String> menu;
 
     /**
@@ -92,6 +95,7 @@ public class NavigationDrawerFragment extends Fragment {
         selectItem(mCurrentSelectedPosition);
 
         // AJOUTS PERSOS
+        menu = new ArrayList<String>();
         new HttpRequestManager().execute();
     }
 
@@ -111,15 +115,6 @@ public class NavigationDrawerFragment extends Fragment {
                 selectItem(position);
             }
         });
-        mDrawerListView.setAdapter(new ArrayAdapter<String>(
-                getActionBar().getThemedContext(),
-                android.R.layout.simple_list_item_activated_1,
-                android.R.id.text1,
-                new String[]{
-                        getString(R.string.title_section1),
-                        getString(R.string.title_section2),
-                        getString(R.string.title_section3),
-                }));
         mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
         return mDrawerListView;
     }
@@ -307,7 +302,22 @@ public class NavigationDrawerFragment extends Fragment {
 
         @Override
         protected void onPostExecute(JSONObject data) {
-            Log.d("JSON", data.toString());
+            String k;
+            Iterator i = data.keys();
+            while (i.hasNext()){
+                k = (String)i.next();
+                try {
+                    menu.add(data.getJSONObject(k).getString("libelle"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            mDrawerListView.setAdapter(new ArrayAdapter<>(
+                    getActionBar().getThemedContext(),
+                    android.R.layout.simple_list_item_activated_1,
+                    android.R.id.text1,
+                    menu.toArray())
+            );
         }
     }
 }
