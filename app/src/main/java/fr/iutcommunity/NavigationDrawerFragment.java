@@ -42,7 +42,9 @@ import java.util.Map;
  */
 public class NavigationDrawerFragment extends Fragment {
 
-    // VARIABLES PERSO
+    //----------------------------------------------------------------------------------------------
+    // VARIABLES PERSOS
+    //----------------------------------------------------------------------------------------------
     public List<String> menu;
 
     /**
@@ -94,7 +96,9 @@ public class NavigationDrawerFragment extends Fragment {
         // Select either the default item (0) or the last selected item.
         selectItem(mCurrentSelectedPosition);
 
+        //------------------------------------------------------------------------------------------
         // AJOUTS PERSOS
+        //------------------------------------------------------------------------------------------
         menu = new ArrayList<String>();
         new HttpRequestManager().execute();
     }
