@@ -1,5 +1,7 @@
 package fr.iutcommunity;
 
+import android.content.Intent;
+import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.app.Activity;
 import android.support.v7.app.ActionBar;
@@ -11,6 +13,7 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -22,12 +25,22 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.lang.reflect.Array;
+import java.util.HashMap;
+import java.util.List;
+
 /**
  * Fragment used for managing interactions for and presentation of a navigation drawer.
  * See the <a href="https://developer.android.com/design/patterns/navigation-drawer.html#Interaction">
  * design guidelines</a> for a complete explanation of the behaviors implemented here.
  */
 public class NavigationDrawerFragment extends Fragment {
+
+    // VARAIBLES PERSOS
+    public List<String> menu;
 
     /**
      * Remember the position of the selected item.
@@ -77,6 +90,9 @@ public class NavigationDrawerFragment extends Fragment {
 
         // Select either the default item (0) or the last selected item.
         selectItem(mCurrentSelectedPosition);
+
+        // AJOUTS PERSOS
+        new HttpRequestManager().execute();
     }
 
     @Override
@@ -87,10 +103,8 @@ public class NavigationDrawerFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        mDrawerListView = (ListView) inflater.inflate(
-                R.layout.fragment_navigation_drawer, container, false);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        mDrawerListView = (ListView) inflater.inflate(R.layout.fragment_navigation_drawer, container, false);
         mDrawerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -278,5 +292,22 @@ public class NavigationDrawerFragment extends Fragment {
          * Called when an item in the navigation drawer is selected.
          */
         void onNavigationDrawerItemSelected(int position);
+    }
+
+    //----------------------------------------------------------------------------------------------
+    // CHARGEMENT DES ELEMENTS DU MENU
+    //----------------------------------------------------------------------------------------------
+
+    private class HttpRequestManager extends AsyncTask<HashMap<?,?>, String, JSONObject> {
+        @Override
+        protected JSONObject doInBackground(HashMap... params) {
+            HttpRequest http = new HttpRequest("http://iut-community.vpeillex.fr/groupe/getAllParents", HttpRequest.POST);
+            return http.connection();
+        }
+
+        @Override
+        protected void onPostExecute(JSONObject data) {
+            Log.d("JSON", data.toString());
+        }
     }
 }
