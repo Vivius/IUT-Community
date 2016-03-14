@@ -51,17 +51,17 @@ public class MainActivity extends AppCompatActivity {
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
 
-        // set a custom shadow that overlays the main content when the drawer opens
+        // Utilisation d'une ombre quand le menu latéral est ouvert.
         mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
-        // set up the drawer's list view with items and click listener
+        // Mise en place des de la liste des départements dans le listview du menu + ajout d'un click listener.
         mDrawerList.setAdapter(new ArrayAdapter<String>(this, R.layout.drawer_list_item, mDepartementsTitles));
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
 
-        // enable ActionBar app icon to behave as action to toggle nav drawer
+        // Modification du bouton Home.
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
-        // ActionBarDrawerToggle ties together the the proper interactions
+        // ActionBarDrawerToggle ties together the proper interactions
         // between the sliding drawer and the action bar app icon
         mDrawerToggle = new ActionBarDrawerToggle(
                 this,                  /* host Activity */
@@ -74,12 +74,12 @@ public class MainActivity extends AppCompatActivity {
                 getSupportActionBar().setTitle(mTitle);
                 invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
             }
-
             public void onDrawerOpened(View drawerView) {
                 getSupportActionBar().setTitle(mDrawerTitle);
                 invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
             }
         };
+
         mDrawerLayout.setDrawerListener(mDrawerToggle);
 
         if (savedInstanceState == null) {
@@ -87,6 +87,18 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // Attribution d'un nouveau titre à l'activity.
+    @Override
+    public void setTitle(CharSequence title) {
+        mTitle = title;
+        getSupportActionBar().setTitle(mTitle);
+    }
+
+    //----------------------------------------------------------------------------------------------
+    // GESTION DE L'ACTION_BAR
+    //----------------------------------------------------------------------------------------------
+
+    // Création du menu de l'ActionBar en utilisant le layout main.
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -94,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
-    /* Called whenever we call invalidateOptionsMenu() */
+    // On cache le menu de l'ActionBar quand le menu latéral est ouvert.
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         // If the nav drawer is open, hide action items related to the content view
@@ -103,22 +115,19 @@ public class MainActivity extends AppCompatActivity {
         return super.onPrepareOptionsMenu(menu);
     }
 
-
     // Gestion de le sélection des items du menu option de l'action bar.
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // The action bar home/up action should open or close the drawer.
-        // ActionBarDrawerToggle will take care of this.
         if (mDrawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
-        // Handle action buttons
+        // Switch prenant en compte chaque item du menu.
         switch(item.getItemId()) {
             case R.id.action_websearch:
-                // create intent to perform web search for this planet
+                // Exemple d'un intent lançant une recherche internet sur le groupe.
                 Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
                 intent.putExtra(SearchManager.QUERY, getSupportActionBar().getTitle());
-                // catch event that there's no activity to handle intent
+                // Vérification que l'activity existe avant de l'appeller.
                 if (intent.resolveActivity(getPackageManager()) != null) {
                     startActivity(intent);
                 } else {
@@ -130,6 +139,22 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        mDrawerToggle.syncState();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        mDrawerToggle.onConfigurationChanged(newConfig);
+    }
+
+    // ---------------------------------------------------------------------------------------------
+    // GESTION DU MENU
+    // ---------------------------------------------------------------------------------------------
+
     // Listener du clic sur un item de la liste du menu.
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
         @Override
@@ -140,16 +165,15 @@ public class MainActivity extends AppCompatActivity {
 
     // Méthode exécutée lors d'un clic sur un élément du menu.
     private void selectItem(int position) {
-        // update the main content by replacing fragments
         Fragment fragment = new DepartementFragment();
+        // Ajout du numéro du département de la liste en argument.
         Bundle args = new Bundle();
         args.putInt(DepartementFragment.ARG_DEPT_NUMBER, position);
         fragment.setArguments(args);
-
+        // On remplae le content_frame par un nouveau DepartementFragment.
         FragmentManager fragmentManager = getFragmentManager();
         fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
-
-        // update selected item and title, then close the drawer
+        // Mise à jour du titre et fermeture du menu.
         mDrawerList.setItemChecked(position, true);
         setTitle(mDepartementsTitles[position]);
         mDrawerLayout.closeDrawer(mDrawerList);
@@ -158,40 +182,12 @@ public class MainActivity extends AppCompatActivity {
         loadCommentaires();
     }
 
-    // Attribution d'un nouveau titre.
-    @Override
-    public void setTitle(CharSequence title) {
-        mTitle = title;
-        getSupportActionBar().setTitle(mTitle);
-    }
-
-    /**
-     * When using the ActionBarDrawerToggle, you must call it during
-     * onPostCreate() and onConfigurationChanged()...
-     */
-
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-        // Sync the toggle state after onRestoreInstanceState has occurred.
-        mDrawerToggle.syncState();
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        // Pass any configuration change to the drawer toggls
-        mDrawerToggle.onConfigurationChanged(newConfig);
-    }
-
-    /**
-     * Fragment gérant l'affichage des département.
-     */
+    // Fragment gérant l'affichage des messages d'un département.
     public static class DepartementFragment extends Fragment {
         public static final String ARG_DEPT_NUMBER = "NUM_DEPARTEMENT";
 
         public DepartementFragment() {
-            // Empty constructor required for fragment subclasses
+            // Constructeur vide pour les classes filles.
         }
 
         // Création de la vue du fragment.
@@ -207,24 +203,22 @@ public class MainActivity extends AppCompatActivity {
 
     // Méthode exécutant la recherche des commentaires pour le département en cours.
     public void loadCommentaires(){
-        HashMap<String, String> dept = new HashMap<>();
-        dept.put("lblGroupe", mTitle.toString());
-        new HttpRequestManager().execute(dept);
+        HashMap<String, String> departement = new HashMap<>();
+        departement.put("lblGroupe", mTitle.toString());
+        new HttpRequestManager().execute(departement);
     }
     // ---------------------------------------------------------------------------------------------
-    // Classe permettant de charger les commentaires d'un groupe.
+    // Classe permettant de charger les commentaires d'un groupe (département)
     // ---------------------------------------------------------------------------------------------
     private class HttpRequestManager extends AsyncTask<HashMap<?,?>, String, JSONObject> {
-        // On peut passer une HashMap avec Clé/Valeurs pour envoyer en POST ou en GET.
         @Override
         protected JSONObject doInBackground(HashMap... params) {
             HttpRequest http = new HttpRequest("http://iut-community.vpeillex.fr/groupe/getMessages", HttpRequest.POST, params[0]);
             return http.connection();
         }
-
-        // Une fois le résultat obtenu, on en fait ce que l'on veut. Il s'agit ici d'un objet JSON.
         @Override
         protected void onPostExecute(JSONObject data) {
+            // Chargement de la liste messages avec data.
             Iterator i = data.keys();
             Integer count = 0;
             List<String> messages = new ArrayList<>();
@@ -237,6 +231,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 count++;
             }
+            // Chargement de la ListView du fragement_departements en fonction des données.
             if(!messages.isEmpty()){
                 ListView listeMessages = (ListView)findViewById(R.id.listMessages);
                 listeMessages.setAdapter(new ArrayAdapter<>(
