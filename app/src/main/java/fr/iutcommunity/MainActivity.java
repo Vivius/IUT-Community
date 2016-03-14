@@ -168,7 +168,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Fragment that appears in the "content_frame", shows a planet
+     * Fragment gérant l'affichage des département.
      */
     public static class DepartementFragment extends Fragment {
         public static final String ARG_DEPT_NUMBER = "NUM_DEPARTEMENT";
