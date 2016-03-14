@@ -5,11 +5,13 @@ import android.app.FragmentManager;
 import android.app.SearchManager;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -21,6 +23,14 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private DrawerLayout mDrawerLayout;
@@ -93,6 +103,8 @@ public class MainActivity extends AppCompatActivity {
         return super.onPrepareOptionsMenu(menu);
     }
 
+
+    // Gestion de le sélection des items du menu option de l'action bar.
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // The action bar home/up action should open or close the drawer.
@@ -118,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    /* The click listner for ListView in the navigation drawer */
+    // Listener du clic sur un item de la liste du menu.
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -126,6 +138,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // Méthode exécutée lors d'un clic sur un élément du menu.
     private void selectItem(int position) {
         // update the main content by replacing fragments
         Fragment fragment = new DepartementFragment();
@@ -140,8 +153,12 @@ public class MainActivity extends AppCompatActivity {
         mDrawerList.setItemChecked(position, true);
         setTitle(mDepartementsTitles[position]);
         mDrawerLayout.closeDrawer(mDrawerList);
+
+        // Chargement des commentaires du département.
+        loadCommentaires();
     }
 
+    // Attribution d'un nouveau titre.
     @Override
     public void setTitle(CharSequence title) {
         mTitle = title;
@@ -177,6 +194,7 @@ public class MainActivity extends AppCompatActivity {
             // Empty constructor required for fragment subclasses
         }
 
+        // Création de la vue du fragment.
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_departement, container, false);
@@ -184,6 +202,49 @@ public class MainActivity extends AppCompatActivity {
             String departement = getResources().getStringArray(R.array.dept_array)[i];
             getActivity().setTitle(departement);
             return rootView;
+        }
+    }
+
+    // Méthode exécutant la recherche des commentaires pour le département en cours.
+    public void loadCommentaires(){
+        HashMap<String, String> dept = new HashMap<>();
+        dept.put("lblGroupe", mTitle.toString());
+        new HttpRequestManager().execute(dept);
+    }
+    // ---------------------------------------------------------------------------------------------
+    // Classe permettant de charger les commentaires d'un groupe.
+    // ---------------------------------------------------------------------------------------------
+    private class HttpRequestManager extends AsyncTask<HashMap<?,?>, String, JSONObject> {
+        // On peut passer une HashMap avec Clé/Valeurs pour envoyer en POST ou en GET.
+        @Override
+        protected JSONObject doInBackground(HashMap... params) {
+            HttpRequest http = new HttpRequest("http://iut-community.vpeillex.fr/groupe/getMessages", HttpRequest.POST, params[0]);
+            return http.connection();
+        }
+
+        // Une fois le résultat obtenu, on en fait ce que l'on veut. Il s'agit ici d'un objet JSON.
+        @Override
+        protected void onPostExecute(JSONObject data) {
+            Iterator i = data.keys();
+            Integer count = 0;
+            List<String> messages = new ArrayList<>();
+            while(i.hasNext()){
+                i.next();
+                try {
+                    messages.add(data.getJSONObject(count.toString()).getString("message"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                count++;
+            }
+            if(!messages.isEmpty()){
+                ListView listeMessages = (ListView)findViewById(R.id.listMessages);
+                listeMessages.setAdapter(new ArrayAdapter<>(
+                        getApplicationContext(),
+                        R.layout.item_message,
+                        messages
+                ));
+            }
         }
     }
 }
