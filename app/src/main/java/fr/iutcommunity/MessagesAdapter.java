@@ -25,20 +25,20 @@ public class MessagesAdapter extends ArrayAdapter<Message> {
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_message, parent, false);
         }
-        // Lookup view for data population
+        // Mise en relation du layout du message.
         TextView txtTitre = (TextView) convertView.findViewById(R.id.txtTitreMessage);
         TextView txtInfosMessage = (TextView) convertView.findViewById(R.id.txtInfosMessage);
         TextView txtMessage = (TextView) convertView.findViewById(R.id.txtContenuMessage);
-        // Populate the data into the template view using the data object
-        txtTitre.setText(message.getTitre());
 
+        // Ajout du titre.
+        txtTitre.setText(message.getTitre());
+        // Ajout de la du nom, prénom et date.
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         SimpleDateFormat hourFormat = new SimpleDateFormat("HH:mm:ss");
         String newDateStr = dateFormat.format(message.getDate());
         String newHourStr = hourFormat.format(message.getDate());
         txtInfosMessage.setText(message.getUtilisateur().getNom()+" "+message.getUtilisateur().getPrenom()+", le "+ newDateStr +" à "+newHourStr);
-
-        // Ajout du message.
+        // Ajout du message à la liste.
         txtMessage.setText(message.getMessage());
         // Retour de la vue complète.
         return convertView;
