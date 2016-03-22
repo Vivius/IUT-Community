@@ -23,7 +23,11 @@ import android.widget.ListView;
 import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -212,16 +216,31 @@ public class MainActivity extends AppCompatActivity {
             while(i.hasNext()){
                 i.next();
                 try {
+                    // Initialisation de l'objet JSON du message
                     JSONObject msgJSONObject = data.getJSONObject(count.toString());
+
+                    // Calcul de la date.
+                    String dtStart = msgJSONObject.getString("date");
+                    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    Date date = new Date();
+                    try {
+                        date = format.parse(dtStart);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+
+                    // Déclaration de l'objet message.
                     Message msg = new Message(
                         msgJSONObject.getString("titre"),
                         msgJSONObject.getString("message"),
+                        date,
                         new Utilisateur(
                             msgJSONObject.getString("login"),
                             msgJSONObject.getString("prenom"),
                             msgJSONObject.getString("nom")
                         )
                     );
+                    //Ajout du message au tableau de messages.
                     messages.add(msg);
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -229,10 +248,9 @@ public class MainActivity extends AppCompatActivity {
                 count++;
             }
 
+            // Utilisation d'un MessageAdapter pour alimenter la liste des messages.
             if(!messages.isEmpty()){
-                // Create the adapter to convert the array to views
                 MessagesAdapter adapter = new MessagesAdapter(getApplicationContext(), messages);
-                // Attach the adapter to a ListView
                 ListView listMessages = (ListView) findViewById(R.id.listMessages);
                 listMessages.setAdapter(adapter);
             }
