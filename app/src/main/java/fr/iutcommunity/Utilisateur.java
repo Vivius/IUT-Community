@@ -10,6 +10,12 @@ public class Utilisateur {
     private String password;
     private String mail;
 
+    public Utilisateur(String login, String prenom, String nom) {
+        this.login = login;
+        this.prenom = prenom;
+        this.nom = nom;
+    }
+
     public Utilisateur(String login, String prenom, String nom, String password, String mail) {
         this.login = login;
         this.prenom = prenom;
