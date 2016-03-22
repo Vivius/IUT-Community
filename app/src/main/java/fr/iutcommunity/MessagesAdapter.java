@@ -6,7 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
@@ -39,8 +38,9 @@ public class MessagesAdapter extends ArrayAdapter<Message> {
         String newHourStr = hourFormat.format(message.getDate());
         txtInfosMessage.setText(message.getUtilisateur().getNom()+" "+message.getUtilisateur().getPrenom()+", le "+ newDateStr +" à "+newHourStr);
 
+        // Ajout du message.
         txtMessage.setText(message.getMessage());
-        // Return the completed view to render on screen
+        // Retour de la vue complète.
         return convertView;
     }
 }
