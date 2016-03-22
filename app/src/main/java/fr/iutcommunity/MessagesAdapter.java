@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 /**
@@ -26,12 +27,18 @@ public class MessagesAdapter extends ArrayAdapter<Message> {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_message, parent, false);
         }
         // Lookup view for data population
-        TextView txtTitre = (TextView) convertView.findViewById(R.id.txtTitre);
-        TextView txtNom = (TextView) convertView.findViewById(R.id.txtNom);
-        TextView txtMessage = (TextView) convertView.findViewById(R.id.txtMessage);
+        TextView txtTitre = (TextView) convertView.findViewById(R.id.txtTitreMessage);
+        TextView txtInfosMessage = (TextView) convertView.findViewById(R.id.txtInfosMessage);
+        TextView txtMessage = (TextView) convertView.findViewById(R.id.txtContenuMessage);
         // Populate the data into the template view using the data object
         txtTitre.setText(message.getTitre());
-        txtNom.setText(message.getUtilisateur().getNom());
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        SimpleDateFormat hourFormat = new SimpleDateFormat("HH:mm:ss");
+        String newDateStr = dateFormat.format(message.getDate());
+        String newHourStr = hourFormat.format(message.getDate());
+        txtInfosMessage.setText(message.getUtilisateur().getNom()+" "+message.getUtilisateur().getPrenom()+", le "+ newDateStr +" à "+newHourStr);
+
         txtMessage.setText(message.getMessage());
         // Return the completed view to render on screen
         return convertView;
