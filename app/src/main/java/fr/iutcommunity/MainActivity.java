@@ -8,7 +8,6 @@ import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -22,14 +21,11 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
-
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private DrawerLayout mDrawerLayout;
@@ -226,7 +222,6 @@ public class MainActivity extends AppCompatActivity {
                             msgJSONObject.getString("nom")
                         )
                     );
-                    Log.d("Message", msg.toString());
                     messages.add(msg);
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -241,16 +236,6 @@ public class MainActivity extends AppCompatActivity {
                 ListView listMessages = (ListView) findViewById(R.id.listMessages);
                 listMessages.setAdapter(adapter);
             }
-
-            /* Chargement de la ListView du fragement_departements en fonction des données.
-            if(!messages.isEmpty()){
-                ListView listeMessages = (ListView)findViewById(R.id.listMessages);
-                listeMessages.setAdapter(new ArrayAdapter<>(
-                        getApplicationContext(),
-                        R.layout.item_message,
-                        messages
-                ));
-            }*/
         }
     }
 }
