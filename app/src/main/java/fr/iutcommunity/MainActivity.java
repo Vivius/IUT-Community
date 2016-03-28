@@ -124,6 +124,14 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(this, R.string.app_not_available, Toast.LENGTH_LONG).show();
                 }
                 return true;
+            case R.id.action_new_message:
+                Intent newMessage = new Intent(this, SendMessageActivity.class);
+                if (newMessage.resolveActivity(getPackageManager()) != null) {
+                    startActivity(newMessage);
+                } else {
+                    Toast.makeText(this, R.string.app_not_available, Toast.LENGTH_LONG).show();
+                }
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

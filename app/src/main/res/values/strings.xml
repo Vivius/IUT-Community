@@ -22,4 +22,8 @@
     <string name="action_settings">Paramètres</string>
     <string name="action_new_message">Nouveau message</string>
     <string name="action_logout">Déconnexion</string>
+    <string name="title_activity_send_message">Envoyer un message</string>
+
+    //Spinner
+    <string name="spinner_departements">Sélection d\'un département</string>
 </resources>
