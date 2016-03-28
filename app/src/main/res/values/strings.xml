@@ -1,7 +1,9 @@
 <resources>
+    //Variabes globales pour le manifest
     <string name="app_name">IUT Community</string>
     <string name="title_activity_main">IUT Community</string>
 
+    //Varaibles du menu latéral.
     <string-array name="dept_array">
         <item>GEA</item>
         <item>GEII</item>
@@ -13,10 +15,11 @@
         <item>TC</item>
     </string-array>
 
-    <string name="drawer_open">Open navigation drawer</string>
-    <string name="drawer_close">Close navigation drawer</string>
-    <string name="action_websearch">Web search</string>
-    <string name="app_not_available">Sorry, there\'s no web browser available</string>
+    //Variables de l'action bar.
+    <string name="drawer_open">Ouvrir le menu latéral</string>
+    <string name="drawer_close">Fermer le menu latéral</string>
+    <string name="app_not_available">Impossible d\'effectuer cette action.</string>
     <string name="action_settings">Paramètres</string>
     <string name="action_new_message">Nouveau message</string>
+    <string name="action_logout">Déconnexion</string>
 </resources>

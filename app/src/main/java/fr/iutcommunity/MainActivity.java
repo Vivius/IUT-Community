@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.RadioButton;
 import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
 
-        // Mise en place des de la liste des départements dans le listview du menu + ajout d'un click listener.
+        // Mise en place des de la liste des dÃ©partements dans le listview du menu + ajout d'un click listener.
         mDrawerList.setAdapter(new ArrayAdapter<String>(this, R.layout.drawer_list_item, mDepartementsTitles));
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
 
@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // Attribution d'un nouveau titre à l'activity.
+    // Attribution d'un nouveau titre Ã  l'activity.
     @Override
     public void setTitle(CharSequence title) {
         mTitle = title;
@@ -89,24 +89,24 @@ public class MainActivity extends AppCompatActivity {
     // GESTION DE L'ACTION_BAR
     //----------------------------------------------------------------------------------------------
 
-    // Création du menu de l'ActionBar en utilisant le layout main.
+    // CrÃ©ation du menu de l'ActionBar en utilisant le layout menu_main.
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main, menu);
+        inflater.inflate(R.menu.menu_main, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
-    // On cache le menu de l'ActionBar quand le menu latéral est ouvert.
+    // On cache le menu de l'ActionBar quand le menu latÃ©ral est ouvert.
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        // If the nav drawer is open, hide action items related to the content view
         boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerList);
-        menu.findItem(R.id.action_websearch).setVisible(!drawerOpen);
+        menu.findItem(R.id.action_new_message).setVisible(!drawerOpen);
+        menu.findItem(R.id.action_logout).setVisible(!drawerOpen);
         return super.onPrepareOptionsMenu(menu);
     }
 
-    // Gestion de le sélection des items du menu option de l'action bar.
+    // Gestion de le sÃ©lection des items du menu de l'action bar.
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (mDrawerToggle.onOptionsItemSelected(item)) {
@@ -114,13 +114,12 @@ public class MainActivity extends AppCompatActivity {
         }
         // Switch prenant en compte chaque item du menu.
         switch(item.getItemId()) {
-            case R.id.action_websearch:
-                // Exemple d'un intent lançant une recherche internet sur le groupe.
-                Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
-                intent.putExtra(SearchManager.QUERY, getSupportActionBar().getTitle());
-                // Vérification que l'activity existe avant de l'appeller.
-                if (intent.resolveActivity(getPackageManager()) != null) {
-                    startActivity(intent);
+            //DÃ©connexion
+            case R.id.action_logout:
+                Intent logout = new Intent(this, LoginActivity.class);
+                // VÃ©rification que l'activity existe avant de l'appeller.
+                if (logout.resolveActivity(getPackageManager()) != null) {
+                    startActivity(logout);
                 } else {
                     Toast.makeText(this, R.string.app_not_available, Toast.LENGTH_LONG).show();
                 }
@@ -154,26 +153,26 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // Méthode exécutée lors d'un clic sur un élément du menu.
+    // MÃ©thode exÃ©cutÃ©e lors d'un clic sur un Ã©lÃ©ment du menu.
     private void selectItem(int position) {
         Fragment fragment = new DepartementFragment();
-        // Ajout du numéro du département de la liste en argument.
+        // Ajout du numÃ©ro du dÃ©partement de la liste en argument.
         Bundle args = new Bundle();
         args.putInt(DepartementFragment.ARG_DEPT_NUMBER, position);
         fragment.setArguments(args);
         // On remplae le content_frame par un nouveau DepartementFragment.
         FragmentManager fragmentManager = getFragmentManager();
         fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
-        // Mise à jour du titre et fermeture du menu.
+        // Mise Ã  jour du titre et fermeture du menu.
         mDrawerList.setItemChecked(position, true);
         setTitle(mDepartementsTitles[position]);
         mDrawerLayout.closeDrawer(mDrawerList);
 
-        // Chargement des commentaires du département.
+        // Chargement des commentaires du dÃ©partement.
         loadCommentaires();
     }
 
-    // Fragment gérant l'affichage des messages d'un département.
+    // Fragment gÃ©rant l'affichage des messages d'un dÃ©partement.
     public static class DepartementFragment extends Fragment {
         public static final String ARG_DEPT_NUMBER = "NUM_DEPARTEMENT";
 
@@ -181,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
             // Constructeur vide pour les classes filles.
         }
 
-        // Création de la vue du fragment.
+        // CrÃ©ation de la vue du fragment.
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_departement, container, false);
@@ -192,14 +191,14 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // Méthode exécutant la recherche des commentaires pour le département en cours.
+    // MÃ©thode exÃ©cutant la recherche des commentaires pour le dÃ©partement en cours.
     public void loadCommentaires(){
         HashMap<String, String> departement = new HashMap<>();
         departement.put("lblGroupe", mTitle.toString());
         new HttpRequestManager().execute(departement);
     }
     // ---------------------------------------------------------------------------------------------
-    // Classe permettant de charger les commentaires d'un groupe (département)
+    // Classe permettant de charger les commentaires d'un groupe (dÃ©partement)
     // ---------------------------------------------------------------------------------------------
     private class HttpRequestManager extends AsyncTask<HashMap<?,?>, String, JSONObject> {
         @Override
@@ -229,7 +228,7 @@ public class MainActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
 
-                    // Déclaration de l'objet message.
+                    // DÃ©claration de l'objet message.
                     Message msg = new Message(
                         msgJSONObject.getString("titre"),
                         msgJSONObject.getString("message"),
