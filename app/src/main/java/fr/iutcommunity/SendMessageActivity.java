@@ -1,6 +1,7 @@
 package fr.iutcommunity;
 
 import android.annotation.TargetApi;
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.AsyncTask;
@@ -8,10 +9,12 @@ import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
@@ -19,6 +22,7 @@ import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -30,34 +34,58 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 
-public class SendMessageActivity extends AppCompatActivity implements ListView.OnItemSelectedListener{
+public class SendMessageActivity extends AppCompatActivity implements ListView.OnItemSelectedListener, View.OnClickListener{
+    // Déclaration d'éléments du layout.
     private Spinner ddlDepartements;
     private ViewGroup rdgPromotions;
+    private LinearLayout llGroupes;
+    private Button btnEnvoyer;
+    // Déclaration de variables statiques.
     private static int HTTP_REQUEST_PROMOTIONS = 1;
     private static int HTTP_REQUEST_GROUPES = 2;
+    private static int HTTP_REQUEST_SEND_MESSAGE = 3;
+    // Propriété contenu le type de requête à effectuer.
     private int httpRequest;
-    private LinearLayout llGroupes;
+    // Propriétés du grouge destinataire sélectionné.
+    private String departement = "undefined";
+    private String promotion = "undefined";
+    private ArrayList<String> groupes = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_send_message);
 
-        rdgPromotions = (ViewGroup)findViewById(R.id.rdgPromotions);
         ddlDepartements = (Spinner)findViewById(R.id.ddlDepartements);
         ddlDepartements.setOnItemSelectedListener(this);
-
+        rdgPromotions = (ViewGroup)findViewById(R.id.rdgPromotions);
         llGroupes = (LinearLayout)findViewById(R.id.llGroupes);
+        btnEnvoyer = (Button)findViewById(R.id.btnEnvoyer);
+        btnEnvoyer.setOnClickListener(this);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
+    // Gestion du bouton retour de l'action bar.
+    public boolean onOptionsItemSelected(MenuItem item){
+        Intent myIntent = new Intent(getApplicationContext(), MainActivity.class);
+        startActivity(myIntent);
+        return true;
+    }
+
+    // Implémentation de l'interface OnItemSelectedListener (gestion du Spinner).
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        // On rend visible le groupe des radio buttons.
         rdgPromotions.setVisibility(View.VISIBLE);
-        Log.d("Departement", ddlDepartements.getSelectedItem().toString());
-
+        // Initialisation de la propriété departement avec le département sélectionné.
+        this.departement = ddlDepartements.getSelectedItem().toString();
+        // Création du paramètre qui sera envoyé en serveur.
         HashMap<String, String> departement = new HashMap<>();
-        departement.put("parent", ddlDepartements.getSelectedItem().toString());
+        departement.put("parent", this.departement);
+        // Définition de la requête.
         httpRequest = HTTP_REQUEST_PROMOTIONS;
+        // Exécution de la requête.
         new HttpRequestManager().execute(departement);
     }
 
@@ -66,14 +94,39 @@ public class SendMessageActivity extends AppCompatActivity implements ListView.O
         rdgPromotions.setVisibility(View.INVISIBLE);
     }
 
+    // Implémentation de l'interface OnClickListener
+    @Override
+    public void onClick(View v) {
+        if(v.getId() == R.id.btnEnvoyer){
+            Log.d("Departement", departement);
+            Log.d("Promotion", promotion);
+            Log.d("Groupes", groupes.toString());
+            httpRequest = HTTP_REQUEST_SEND_MESSAGE;
+
+            // Création des paramètres de la requête.
+            HashMap<String, String> message = new HashMap<>();
+            message.put("departement", departement);
+            message.put("promotion", promotion);
+            JSONArray groupeJSON = new JSONArray(groupes);
+            message.put("groupes", groupeJSON.toString());
+            // Envoi du message au serveur.
+            new HttpRequestManager().execute(message);
+        }
+    }
+
     // ---------------------------------------------------------------------------------------------
     // Classe permettant de charger les commentaires sous-groupes d'un département.
     // ---------------------------------------------------------------------------------------------
     private class HttpRequestManager extends AsyncTask<HashMap<?,?>, String, JSONObject> {
         @Override
         protected JSONObject doInBackground(HashMap... params) {
-            HttpRequest http = new HttpRequest("http://iut-community.vpeillex.fr/groupe/getChildrenByParentLibelle", HttpRequest.POST, params[0]);
-            return http.connection();
+            if(httpRequest == HTTP_REQUEST_SEND_MESSAGE){
+                HttpRequest http = new HttpRequest("http://iut-community.vpeillex.fr/message/insert", HttpRequest.POST, params[0]);
+                return http.connection();
+            }else{
+                HttpRequest http = new HttpRequest("http://iut-community.vpeillex.fr/groupe/getChildrenByParentLibelle", HttpRequest.POST, params[0]);
+                return http.connection();
+            }
         }
 
         @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -85,6 +138,10 @@ public class SendMessageActivity extends AppCompatActivity implements ListView.O
                 httpRequest = HTTP_REQUEST_GROUPES;
                 // On efface les radio butttons existants.
                 rdgPromotions.removeAllViews();
+                llGroupes.removeAllViews();
+                // Mise des propriétés du département
+                promotion = "undefined";
+                groupes.clear();
                 // Si il existe des promotions pour ce DUT en BDD.
                 if(data.names() != null){
                     for(int i=0; i < data.names().length(); i++){
@@ -108,8 +165,9 @@ public class SendMessageActivity extends AppCompatActivity implements ListView.O
                             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                                 if (buttonView.isChecked()) {
                                     // On lance une nouvelle requête pour obtenir les groupes en cas de sélection.
-                                    Log.d("Promotion", buttonView.getText().toString());
+                                    promotion = buttonView.getText().toString();
                                     llGroupes.removeAllViews();
+                                    groupes.clear();
                                     HashMap<String, String> promotion = new HashMap<>();
                                     promotion.put("parent", buttonView.getText().toString());
                                     new HttpRequestManager().execute(promotion);
@@ -137,8 +195,20 @@ public class SendMessageActivity extends AppCompatActivity implements ListView.O
                                     new int[]{android.R.attr.state_checked} // Bouton activé
                             }, new int[] {Color.BLACK, Color.BLUE});
                     cb.setButtonTintList(colorStateList);
+                    cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                        @Override
+                        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                            if(buttonView.isChecked()){
+                                groupes.add(buttonView.getText().toString());
+                            }else{
+                                groupes.remove(groupes.indexOf(buttonView.getText().toString()));
+                            }
+                        }
+                    });
                 }
                 Log.d("Groupes", data.toString());
+            }else if(httpRequest == HTTP_REQUEST_SEND_MESSAGE){
+                Toast.makeText(getApplicationContext(), "Message envoyé", Toast.LENGTH_SHORT).show();
             }
         }
     }
