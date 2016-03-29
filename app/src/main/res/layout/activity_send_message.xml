@@ -46,22 +46,48 @@
         android:layout_below="@+id/ddlDepartements"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:id="@+id/rdgPromotions"
-        android:orientation="horizontal">
-
-    </RadioGroup>
+        android:orientation="horizontal"
+        android:id="@+id/rdgPromotions"></RadioGroup>
 
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="0dp"
         android:layout_below="@+id/rdgPromotions"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_margin="0dp"
-        android:layout_marginLeft="0dp"
-        android:layout_marginRight="0dp"
-        android:layout_marginBottom="0dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:id="@+id/llGroupes"></LinearLayout>
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/txtObjet"
+        android:layout_below="@+id/llGroupes"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignRight="@+id/ddlDepartements"
+        android:layout_alignEnd="@+id/ddlDepartements"
+        android:hint="Objet" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textMultiLine"
+        android:ems="10"
+        android:id="@+id/txtMessage"
+        android:layout_below="@+id/txtObjet"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignRight="@+id/txtObjet"
+        android:layout_alignEnd="@+id/txtObjet"
+        android:hint="Message" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Envoyer"
+        android:id="@+id/btnEnvoyer"
+        android:layout_below="@+id/txtMessage"
+        android:layout_centerHorizontal="true" />
+
 </RelativeLayout>
