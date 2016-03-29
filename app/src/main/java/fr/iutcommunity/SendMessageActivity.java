@@ -17,6 +17,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RadioButton;
@@ -40,6 +41,8 @@ public class SendMessageActivity extends AppCompatActivity implements ListView.O
     private ViewGroup rdgPromotions;
     private LinearLayout llGroupes;
     private Button btnEnvoyer;
+    private EditText txtTitre;
+    private EditText txtMessage;
     // Déclaration de variables statiques.
     private static int HTTP_REQUEST_PROMOTIONS = 1;
     private static int HTTP_REQUEST_GROUPES = 2;
@@ -60,6 +63,8 @@ public class SendMessageActivity extends AppCompatActivity implements ListView.O
         ddlDepartements.setOnItemSelectedListener(this);
         rdgPromotions = (ViewGroup)findViewById(R.id.rdgPromotions);
         llGroupes = (LinearLayout)findViewById(R.id.llGroupes);
+        txtTitre = (EditText)findViewById(R.id.txtObjet);
+        txtMessage = (EditText)findViewById(R.id.txtMessage);
         btnEnvoyer = (Button)findViewById(R.id.btnEnvoyer);
         btnEnvoyer.setOnClickListener(this);
 
@@ -109,6 +114,9 @@ public class SendMessageActivity extends AppCompatActivity implements ListView.O
             message.put("promotion", promotion);
             JSONArray groupeJSON = new JSONArray(groupes);
             message.put("groupes", groupeJSON.toString());
+            message.put("message", txtMessage.getText().toString());
+            message.put("titre", txtTitre.getText().toString());
+            message.put("utilisateur", "1");
             // Envoi du message au serveur.
             new HttpRequestManager().execute(message);
         }
@@ -170,6 +178,7 @@ public class SendMessageActivity extends AppCompatActivity implements ListView.O
                                     groupes.clear();
                                     HashMap<String, String> promotion = new HashMap<>();
                                     promotion.put("parent", buttonView.getText().toString());
+                                    httpRequest = HTTP_REQUEST_GROUPES;
                                     new HttpRequestManager().execute(promotion);
                                 }
                             }
