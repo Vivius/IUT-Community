@@ -62,7 +62,7 @@ public class SendMessageActivity extends AppCompatActivity implements ListView.O
 
         ddlDepartements = (Spinner)findViewById(R.id.ddlDepartements);
         ddlDepartements.setOnItemSelectedListener(this);
-        rdgPromotions = (ViewGroup)findViewById(R.id.rdgPromotions);
+        rdgPromotions = (RadioGroup)findViewById(R.id.rdgPromotions);
         llGroupes = (LinearLayout)findViewById(R.id.llGroupes);
         txtTitre = (EditText)findViewById(R.id.txtObjet);
         txtMessage = (EditText)findViewById(R.id.txtMessage);
@@ -156,8 +156,28 @@ public class SendMessageActivity extends AppCompatActivity implements ListView.O
                 groupes.clear();
                 // Si il existe des promotions pour ce DUT en BDD.
                 if(data.names() != null){
+                    //Création du bouton pour envoyer à toutes les promos.
+                    final RadioButton btnToutesLesPromos = new RadioButton(getApplicationContext());
+                    btnToutesLesPromos.setText("Toutes les promos");
+                    btnToutesLesPromos.setTextColor(Color.BLACK);
+                    // Définition des couleurs du bouton pour l'état checked ou non.
+                    ColorStateList colorStateList = new ColorStateList(
+                            new int[][]{
+                                    new int[]{-android.R.attr.state_checked}, // Bouton désactivé
+                                    new int[]{android.R.attr.state_checked} // Bouton activé
+                            }, new int[] {Color.BLACK, Color.BLUE});
+                    btnToutesLesPromos.setButtonTintList(colorStateList);
+                    btnToutesLesPromos.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                        @Override
+                        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                            promotion = buttonView.getText().toString();
+                            groupes.clear();
+                            llGroupes.removeAllViews();
+                        }
+                    });
+                    rdgPromotions.addView(btnToutesLesPromos);
+                    // Création de chaque radio button dynamiquement.
                     for(int i=0; i < data.names().length(); i++){
-                        // Création de chaque radio button dynamiquement.
                         final RadioButton button = new RadioButton(getApplicationContext());
                         try {
                             button.setText(data.getJSONObject(data.names().getString(i)).getString("libelle"));
@@ -165,11 +185,6 @@ public class SendMessageActivity extends AppCompatActivity implements ListView.O
                             e.printStackTrace();
                         }
                         button.setTextColor(Color.BLACK);
-                        ColorStateList colorStateList = new ColorStateList(
-                                new int[][]{
-                                        new int[]{-android.R.attr.state_checked}, // Bouton désactivé
-                                        new int[]{android.R.attr.state_checked} // Bouton activé
-                                }, new int[] {Color.BLACK, Color.BLUE});
                         button.setButtonTintList(colorStateList);
                         // Ajout d'un événement permettant de détecter un changement d'état sur chaque radio button.
                         button.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -188,6 +203,7 @@ public class SendMessageActivity extends AppCompatActivity implements ListView.O
                             }
                         });
                         // Ajout de tous les boutons à la vue.
+                        btnToutesLesPromos.setChecked(true);
                         rdgPromotions.addView(button);
                     }
                 }
@@ -222,6 +238,9 @@ public class SendMessageActivity extends AppCompatActivity implements ListView.O
                 Log.d("Groupes", data.toString());
             }else if(httpRequest == HTTP_REQUEST_SEND_MESSAGE){
                 Toast.makeText(getApplicationContext(), "Message envoyé", Toast.LENGTH_SHORT).show();
+                Intent mainAct = new Intent(getApplicationContext(), MainActivity.class);
+                mainAct.putExtra("idUtilisateur", String.valueOf(idUtilisateur));
+                startActivity(mainAct);
             }
         }
     }
