@@ -49,10 +49,11 @@ public class SendMessageActivity extends AppCompatActivity implements ListView.O
     private static int HTTP_REQUEST_SEND_MESSAGE = 3;
     // Propriété contenu le type de requête à effectuer.
     private int httpRequest;
-    // Propriétés du grouge destinataire sélectionné.
+    // Propriétés liées au message.
     private String departement = "undefined";
     private String promotion = "undefined";
     private ArrayList<String> groupes = new ArrayList<>();
+    private int idUtilisateur = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,11 +70,14 @@ public class SendMessageActivity extends AppCompatActivity implements ListView.O
         btnEnvoyer.setOnClickListener(this);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Bundle extras = getIntent().getExtras();
+        idUtilisateur = extras.getInt("idUtilisateur");
     }
 
     // Gestion du bouton retour de l'action bar.
     public boolean onOptionsItemSelected(MenuItem item){
         Intent myIntent = new Intent(getApplicationContext(), MainActivity.class);
+        myIntent.putExtra("idUtilisateur", idUtilisateur);
         startActivity(myIntent);
         return true;
     }
@@ -116,7 +120,7 @@ public class SendMessageActivity extends AppCompatActivity implements ListView.O
             message.put("groupes", groupeJSON.toString());
             message.put("message", txtMessage.getText().toString());
             message.put("titre", txtTitre.getText().toString());
-            message.put("utilisateur", "1");
+            message.put("utilisateur", String.valueOf(idUtilisateur));
             // Envoi du message au serveur.
             new HttpRequestManager().execute(message);
         }

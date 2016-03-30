@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -40,10 +41,17 @@ public class MainActivity extends AppCompatActivity {
     private CharSequence mTitle;
     private String[] mDepartementsTitles;
 
+    private int idUtilisateur = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //Récupération de l'ID utilisateur.
+        Bundle extras = getIntent().getExtras();
+        idUtilisateur = extras.getInt("idUtilisateur");
+        Log.d("IdUtilisateur", String.valueOf(idUtilisateur));
 
         mTitle = mDrawerTitle = getTitle();
         mDepartementsTitles = getResources().getStringArray(R.array.dept_array);
@@ -126,6 +134,7 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             case R.id.action_new_message:
                 Intent newMessage = new Intent(this, SendMessageActivity.class);
+                newMessage.putExtra("idUtilisateur", idUtilisateur);
                 if (newMessage.resolveActivity(getPackageManager()) != null) {
                     startActivity(newMessage);
                 } else {

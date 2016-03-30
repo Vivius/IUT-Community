@@ -82,8 +82,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         @Override
         protected void onPostExecute(JSONObject data) {
             try {
-                if(data.getBoolean("message")){
+                if(data.getInt("message") != 0){
                     Intent mainAct = new Intent(LoginActivity.this, MainActivity.class);
+                    mainAct.putExtra("idUtilisateur", data.getInt("message"));
                     LoginActivity.this.startActivity(mainAct);
                 }else{
                     Toast.makeText(getApplicationContext(),"Echec de connexion. Veuillez vérifier vos identifiants", Toast.LENGTH_LONG).show();
